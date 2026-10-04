@@ -1,0 +1,19 @@
+#!/bin/bash
+# yazi-sixel — запуск yazi в xterm с настоящими пиксельными превью картинок (sixel).
+#
+# Почему так. Терминал MATE (VTE) не умеет ни sixel, ни kitty-протокол, и yazi при
+# заданном DISPLAY всегда уходит на драйвер «X11», который требует Überzug++.
+# xterm же умеет sixel (в Debian собран с его поддержкой), и yazi это видит:
+#   Emulator.probe: ... sixel: true, version: XTerm(398)
+#   Adapter: Drivers.matches: Sixel
+# Важное отличие от обёртки yazi-img (chafa без DISPLAY): здесь DISPLAY сохраняется,
+# поэтому внутри yazi работают внешние открыватели файлов и буфер обмена (xclip).
+#
+# Требуется режим VT340 у xterm (xterm -ti vt340) — иначе sixel-запросы не поддерживаются
+# и yazi покажет картинки блоками (chafa) либо ничего.
+#
+# Использование: yazi-sixel [каталог]
+set -u
+DIR="${1:-$PWD}"
+exec xterm -ti vt340 -fa Monospace -fs 11 -geometry 110x32 -title "yazi (sixel)" \
+     -e /usr/bin/yazi "$DIR"
